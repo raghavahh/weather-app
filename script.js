@@ -14,11 +14,14 @@ function getWeather(city) {
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
 
     fetch(url)
-        .then(response => {
-            if (!response.ok) throw new Error("City not found");
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
+            if (data.cod !== 200) {
+                // City not found or invalid input
+                throw new Error(data.message);
+            }
+
+            // Update HTML with actual weather data
             cityName.textContent = data.name;
             temperature.textContent = `Temperature: ${data.main.temp}°C`;
             description.textContent = `Description: ${data.weather[0].description}`;
@@ -26,12 +29,13 @@ function getWeather(city) {
             windSpeed.textContent = `Wind Speed: ${data.wind.speed} km/h`;
         })
         .catch(err => {
-            cityName.textContent = "Error";
+            // Reset all fields and alert user
+            cityName.textContent = "City not found";
             temperature.textContent = "--°C";
             description.textContent = "--";
             humidity.textContent = "--%";
             windSpeed.textContent = "-- km/h";
-            alert(err.message);
+            alert(`Error: ${err.message}`);
         });
 }
 
